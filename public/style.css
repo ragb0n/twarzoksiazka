@@ -1,0 +1,180 @@
+*{
+    font-family: 'Ubuntu', sans-serif;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    background-color: #ebebeb;
+}
+
+header {
+    top: 0;
+    position: fixed;
+    color: white;
+    width: 100vw;
+    max-width: 100%;
+    box-shadow: 0px 7px 41px -10px rgba(0,0,0,1);
+    background-color: #103A6E;
+    z-index:10;
+}
+
+nav {
+    margin: 0vh 20vw 0vh 20vw;
+    display: inline-block;
+    padding-bottom: 0.5vw;
+}
+
+.logo{
+    font-size: 1.5vw;
+    max-width: 4vw;
+    padding: 0.5vh 5vw 0.1vh 0;
+    display: inline-block;
+}
+
+nav ul {
+    list-style-type: none;
+    display: inline-block;
+    line-height: normal;
+    margin-block-start: 0em;
+    margin-block-end: 0em;
+}
+
+nav li{
+    display: inline-block;
+    padding: 0vh 1vw 0vh 1vw;
+    line-height: 100%;
+    vertical-align:text-top;
+}
+
+nav a:hover,
+button:hover,
+nav li:hover{
+    filter: brightness(80%);
+    transition: 0.5s;
+}
+
+nav ul a {
+    color: white;
+    text-decoration: none;
+    font-size: 0.8vw;
+}
+ nav a {
+    color: white;
+    text-decoration: none;
+ }
+
+footer{
+    text-align: center;
+    margin-top: 2vh;
+    color: gray;
+}
+
+main {
+    padding: 6vh 20vw 0vh 20vw;
+}
+
+.post {
+    width: 41vw;
+    padding: 2vh 1.5vw 2vh 1.5vw;
+    margin: 0.2vh 0 0 0;
+    background-color: white;
+    box-shadow: 0px 0px 120px -55px rgba(0,0,0,0.75);
+}
+
+.post_date {
+    color: gray;
+    font-size: smaller;
+}
+
+.post_author{
+    font-size: 0.8vw;
+}
+
+.post_info {
+    display: inline-block;
+    vertical-align: 80%;
+    padding-left: 0.5vw;
+}
+
+.post_author_image{
+    display: inline-block;
+}
+
+.post_author_image img{
+    display: inline-block;
+    width: 2.5vw; 
+    height:2.5vw; 
+    border-radius:50%
+}
+
+.post_content{
+    font-size: 0.7vw;
+    padding: 0.5vh 0 0 0;
+}
+
+.post:hover {
+    background-color:#f2f2f2;
+    transition: 0.2s;
+}
+
+.side_content{
+    width: 14vw;
+    height: 17vh;
+    background-color: white;
+    float: right;
+    box-shadow: 0px 0px 120px -55px rgba(0,0,0,0.75);
+    z-index: 1;
+}
+
+.profile_images_photo {
+    margin: 0.5vh 4.75vw 0.5vh 4.75vw;
+    z-index: 1;
+}
+
+.profile_images_photo img {
+    display: inline-block;
+    width:4.5vw; 
+    height:4.5vw; 
+    border-radius:50%;
+    z-index: 1;
+}
+
+.profile_welcome{
+    text-align: center;
+    font-size: 1vw;
+    display: block;
+    padding: 1vh 0 1vh 0;
+}
+
+.profile_images_background{
+    width: 100%;
+    background-image: url(../public/images/background_teset.jpg);
+    background-repeat: no-repeat;
+    background-size: 100%;
+    padding: 0.5vw 0 0.5vw 0;
+}
+
+.profile_welcome a{
+    text-decoration: none;
+    color: black;
+}
+
+textarea{
+    width: 100%;
+    height: 8vh;
+    resize: none;
+    color: gray;
+}
+
+button{
+    background-color: #103A6E;
+    color: white;
+    padding: 0.15vw;
+    cursor: pointer;
+    margin-top: 0.2vh;
+}
+
+.post_create{
+    padding: 2vh 1.5vw 0.5vh 1.5vw;
+}
