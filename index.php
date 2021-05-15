@@ -32,10 +32,15 @@ try {
 }catch (ConfigurationException $e){
     echo "<h3>Wystąpił błąd w aplikacji</h3>";
     echo 'Błąd z konfiguracją. Skontaktuj się z administratorem';
+    echo $e;
 }catch (AppException $e){
     echo "<h1>Wystąpił błąd w aplikacji</h1>";
     echo '<h3>' . $e->getMessage() . '</h3>';
+    echo $e;
+
 }catch (Throwable $e){
     echo "<h3>Wystąpił błąd w aplikacji</h3>";
+    echo $e;
+
 }
 

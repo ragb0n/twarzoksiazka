@@ -16,6 +16,9 @@
             <?php if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] == true): ?>    
                 <ul>
                     <li>
+                        <a href="/?action=profile"><i class="fas fa-user-alt"></i> Profil</a>
+                    </li>
+                    <li>
                         <a href="/?action=friends"><i class="fas fa-user-friends"></i> Znajomi</a>
                     </li>
                     <li>
@@ -34,23 +37,17 @@
                         <a href="/?action=logout"><i class="fas fa-sign-out-alt"></i> Wyloguj</a>
                     </li>
                 </ul>
-            <?php elseif(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] != true): ?>
-                <ul>
-                    <li>
-                        <a href="/?action=login"><i class="fas fa-sign-out-alt"></i> Logowanie</a>
-                    </li>
-                    <li>
-                        <a href="/?action=register"><i class="fas fa-sign-out-alt"></i> Rejestracja</a>
-                    </li>
-                </ul>
             <?php endif; ?>
             </nav>
         </header>
         <main>
             <?php require_once("pages/$page.php"); ?>
         </main>
+
         <footer>
-            <i>twarzoksiążka 2021 - Patryk Marcinków</i>
+            <i>twarzoksiążka 2021 - V.0.5.4 - Patryk Marcinków</i>
+            <br>
+            <i>Ostatnia aktualizacja: 07.05.2021</i>
         </footer>
     </body>
 </html>
