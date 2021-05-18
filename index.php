@@ -37,5 +37,6 @@ try {
     echo '<h3>' . $e->getMessage() . '</h3>';
 }catch (Throwable $e){
     echo "<h3>Wystąpił błąd w aplikacji</h3>";
+    echo '<h3>' . $e->getMessage() . '</h3>';
 }
 
