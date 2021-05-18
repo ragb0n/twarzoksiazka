@@ -20,6 +20,7 @@ class Database
             $this->configurationValidation($config);
             $this->createConnection($config);
         }catch (PDOException $e){
+            echo $e;
             throw new StorageException('Błąd połączeniz a bazą danych');
         }
     }
@@ -78,6 +79,7 @@ class Database
 
             $this->conn->exec($query);
         }catch(Throwable $e){
+                echo $e;
             throw new StorageException("Błąd tworzenia konta!");
         }
     }
@@ -104,6 +106,7 @@ class Database
             $result = $this->conn->query($query); 
             return $result->fetchAll(PDO::FETCH_ASSOC); //fetchAll() zastepuje foreach, zwraca tablicę, fetch() pobiera tylko pierwszy element zwrócony przez zapytanie
         }catch(Throwable $e){
+                echo $e;
             throw new StorageException("Nie udało się pobrac postów", 400, $e);
         }
 
