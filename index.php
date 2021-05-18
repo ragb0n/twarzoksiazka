@@ -15,7 +15,7 @@ require_once('src/Exceptions/AppException.php');
 require_once('src/Exceptions/ConfigurationException.php');
 
 
-$configuration = require_once('config/config.php');;
+$configuration = require_once('config/config.php');
 
 $request = [
     'get' => $_GET,
