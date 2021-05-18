@@ -44,13 +44,23 @@ class Controller
                     $viewParams = $this->getProfileData(intval($_SESSION['id']));
                 }else{
                     $viewParams = $this->getProfileData(intval($dataGet['id']));
-                    $viewParams['isInvited'] = $this->database->checkIfInvited($_SESSION['id'], $dataGet['id']);
-                    if(isset($dataPost['invite']) && $dataPost['invite'] == 'true'){
-                        $this->database->sendInvitation($_SESSION['id'], $dataGet['id']);
-                    }
-                    if(isset($dataPost['invite']) && $dataPost['invite'] == 'false'){
-                        $this->database->abortInvitation($_SESSION['id'], $dataGet['id']);
-                    }
+                    $viewParams['friendStatus'] = $this->database->checkIfAlreadyFriend($_SESSION['id'], $dataGet['id']);
+                    if($viewParams['friendStatus'] == false){
+                        $viewParams['isInvited'] = $this->database->checkIfInvited($_SESSION['id'], $dataGet['id']);
+                        $viewParams['pendingInvitation'] = $this->database->checkIfInvited($dataGet['id'], $_SESSION['id']);
+                        if(isset($dataPost['invite']) && $dataPost['invite'] == 'send'){
+                            $this->database->sendInvitation($_SESSION['id'], $dataGet['id']);
+                        }
+                        if(isset($dataPost['invite']) && $dataPost['invite'] == 'abort'){
+                            $this->database->abortInvitation($_SESSION['id'], $dataGet['id']);
+                        }
+                        if(isset($dataPost['invite']) && $dataPost['invite'] == 'accept'){
+                            $this->database->acceptInvitation($dataGet['id'], $_SESSION['id']);
+                        }
+                        if(isset($dataPost['invite']) && $dataPost['invite'] == 'delete'){
+                            $this->database->deleteFriend($_SESSION['id'], $dataGet['id']);
+                        }
+                        };
                 }
             break;
             case 'friends':
@@ -61,7 +71,7 @@ class Controller
                     $resultsAllUsers = $this->database->getUserProfiles($data['searchQuery'], null);
                 }else{
                     $resultsFriends = $this->database->getUserProfiles(null, $_SESSION['id']);
-                    $resultsAllUsers = null;
+                    $resultsAllUsers = $this->database->getUserProfiles(null, null);
                 }
                 $viewParams = [
                     "friends" => $resultsFriends,

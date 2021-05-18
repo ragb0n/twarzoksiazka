@@ -30,31 +30,58 @@
                 <div class="profile_page_tile">
                     <i class="fas fa-cog"></i> Edytuj profil
                 </div>
-                <?php dump($params); ?>
-            <?php endif ?>
-            <?php if ($params['profileData']['user_id'] != $_SESSION['id']): ?>
-                <?php if($params['isInvited'] == 0): ?>
-                        <form action="/?action=profile&id=<?php echo$params['profileData']['user_id'] ?>" method="post" id="inviteButton">
-                            <input type="hidden" name="invite" value="true">
-                            <button type="submit" form="inviteButton" class="profile_page_tile">
-                                <i class="fas fa-user-plus" style="font-size: 1vw; color: #103A6E; padding-right: 1vw; vertical-align: 35%;"></i>
-                                    <div style="display: inline-block">
-                                        Zaproś do znajomych
-                                    </div>
-                            </button>
-                        </form>
+            </a>
+            <?php else: ?>
+                <?php if($params['friendStatus'] == 1): ?>
+                    <form method="post" id="inviteButton">
+                        <input type="hidden" name="invite" value="delete">
+                        <button type="submit" form="inviteButton" class="profile_page_tile">
+                            <i class="fas fa-check" style="font-size: 1vw; color: green; padding-right: 1vw; vertical-align: 35%;"></i>
+                                <div style="display: inline-block">
+                                    Jesteście znajomymi
+                                    </br>
+                                    <small>Kliknij aby usunąć znajomego </small>
+                                </div>
+                        </button>
+                    </form>
                 <?php else: ?>
-                        <form method="post" id="inviteButton">
-                            <input type="hidden" name="invite" value="false">
-                            <button type="submit" form="inviteButton" class="profile_page_tile">
-                                <i class="fas fa-check" style="font-size: 1vw; color: green; padding-right: 1vw; vertical-align: 35%;"></i>
-                                    <div style="display: inline-block">
-                                        Zaproszono
-                                        </br>
-                                        <small>Kliknij aby anulować </small>
-                                    </div>
-                            </button>
-                        </form>
+                    <?php if ($params['profileData']['user_id'] != $_SESSION['id']): ?>
+                        <?php if($params['isInvited'] == 1): ?>
+                                <form method="post" id="inviteButton">
+                                    <input type="hidden" name="invite" value="abort">
+                                    <button type="submit" form="inviteButton" class="profile_page_tile">
+                                        <i class="fas fa-check" style="font-size: 1vw; color: green; padding-right: 1vw; vertical-align: 35%;"></i>
+                                            <div style="display: inline-block">
+                                                Zaproszono
+                                                </br>
+                                                <small>Kliknij aby anulować </small>
+                                            </div>
+                                    </button>
+                                </form>
+                        <?php elseif($params['pendingInvitation'] == 1): ?>
+                            <form method="post" id="inviteButton">
+                                <input type="hidden" name="invite" value="accept">
+                                <button type="submit" form="inviteButton" class="profile_page_tile">
+                                    <i class="fas fa-check" style="font-size: 1vw; color: green; padding-right: 1vw; vertical-align: 35%;"></i>
+                                        <div style="display: inline-block">
+                                            Zostałeś zaproszony
+                                            </br>
+                                            <small>Kliknij aby przyjąć zaproszenie </small>
+                                        </div>
+                                </button>
+                            </form>
+                        <?php elseif($params['isInvited'] == 0): ?>
+                            <form action="/?action=profile&id=<?php echo$params['profileData']['user_id'] ?>" method="post" id="inviteButton">
+                                <input type="hidden" name="invite" value="send">
+                                <button type="submit" form="inviteButton" class="profile_page_tile">
+                                    <i class="fas fa-user-plus" style="font-size: 1vw; color: #103A6E; padding-right: 1vw; vertical-align: 35%;"></i>
+                                        <div style="display: inline-block">
+                                            Zaproś do znajomych
+                                        </div>
+                                </button>
+                            </form>
+                        <?php endif ?>
+                    <?php endif ?>
                 <?php endif ?>
             <?php endif ?>
         </div>

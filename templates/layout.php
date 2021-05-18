@@ -19,7 +19,7 @@
                         <a href="/?action=profile"><i class="fas fa-user-alt"></i> Profil</a>
                     </li>
                     <li>
-                        <a href="/?action=friends"><i class="fas fa-user-friends"></i> Znajomi</a>
+                        <a href="/?action=friends"><i class="fas fa-user-friends"></i> Ludzie</a>
                     </li>
                     <li>
                         <a href="/?action=groups"><i class="fas fa-users"></i> Grupy</a>
@@ -47,7 +47,7 @@
         <footer>
             <i>twarzoksiążka 2021 - V.0.5.4 - Patryk Marcinków</i>
             <br>
-            <i>Ostatnia aktualizacja: 07.05.2021</i>
+            <i>Ostatnia aktualizacja: 18.05.2021</i>
         </footer>
     </body>
 </html>

@@ -46,7 +46,7 @@ class Database
         }
     }
 
-    public function abortInvitation(string $user1Id, string $user2Id)
+    public function abortInvitation(string $user1Id, string $user2Id): void
     {
         try{
             $query = "DELETE FROM invitations WHERE user_1_id = $user1Id AND user_2_id = $user2Id";
@@ -54,6 +54,59 @@ class Database
             header("Location: /?action=profile&id=$user2Id");
         }catch(PDOException $e){
             throw new StorageException("Błąd wysyłania zaproszenia");
+        }
+    }
+
+    public function acceptInvitation(string $user1Id, string $user2Id): void
+    {
+        try{
+            $query = "UPDATE invitations SET accepted = true WHERE user_1_id = $user1Id AND user_2_id = $user2Id;";
+            $this->conn->exec($query);
+            $this->addFriend($user1Id, $user2Id);
+            header("Location: /?action=profile&id=$user2Id");
+        }catch(PDOException $e){
+            dump($e);
+            throw new StorageException("Błąd akceptowania zaproszenia!");
+        }
+    }
+
+    private function addFriend(string $user1Id, string $user2Id): void{
+        try{
+            intval($user1Id);
+            intval($user2Id);
+
+            $query = "INSERT INTO friends VALUES ($user1Id, $user2Id)";
+            $this->conn->exec($query);
+            $query = "DELETE FROM invitations WHERE user_1_id = $user1Id AND user_2_id = $user2Id";
+            $this->conn->exec($query);
+        }catch(PDOException $e){
+            throw new StorageException("Błąd dodawania do znajomych!");
+        }
+    }
+
+    public function checkIfAlreadyFriend(string $user1Id, string $user2Id): bool{
+        try{
+            $query = "SELECT COUNT(*) FROM friends WHERE (user_id_1 = $user1Id AND user_id_2 = $user2Id) OR (user_id_1 = $user2Id AND user_id_2 = $user1Id)";
+            $result = $this->conn->query($query);
+            if($result->fetchColumn() != 0){
+                return true;
+            }else{
+                return false;
+            }
+        }catch(PDOException $e){
+            dump($e);
+            throw new StorageException("Błąd sprawdzania statusu");
+        }
+    }
+
+    public function deleteFriend(string $user1Id, string $user2Id){
+        try{
+            $query = "DELETE FROM friends WHERE (user_id_1 = $user1Id AND user_id_2 = $user2Id) OR (user_id_1 = $user2Id AND user_id_2 = $user1Id)";
+            $this->conn->exec($query);
+            return true;
+        }catch(PDOException $e){
+            dump($e);
+            throw new StorageException("Błąd sprawdzania statusu");
         }
     }
     public function checkIfInvited(string $user1Id, string $user2Id): bool
@@ -75,12 +128,12 @@ class Database
         try{
             if(isset($userId)){
                 if(isset($searchQuote)){
-                    $query = "SELECT DISTINCT user_id, name, surname FROM users WHERE name = '$searchQuote' OR surname = '$searchQuote' OR CONCAT(name, ' ', surname) = '$searchQuote';";
+                    $query = "SELECT DISTINCT user_id, name, surname FROM users, friends WHERE (name = '$searchQuote' OR surname = '$searchQuote' OR CONCAT(name, ' ', surname) = '$searchQuote') AND ((friends.user_id_1 = $userId AND friends.user_id_2 = users.user_id) OR (friends.user_id_2 = $userId AND friends.user_id_1 = users.user_id));";
                 }else{
-                    $query = "SELECT user_id, name, surname FROM users";
+                    $query = "SELECT user_id, name, surname FROM users, friends WHERE (friends.user_id_1 = $userId AND friends.user_id_2 = users.user_id) OR (friends.user_id_2 = $userId AND friends.user_id_1 = users.user_id);";
                 }
             }else{
-                $query = "SELECT DISTINCT user_id, name, surname FROM users WHERE name = '$searchQuote' OR surname = '$searchQuote' OR CONCAT(name, ' ', surname) = '$searchQuote';";
+                $query = "SELECT user_id, name, surname FROM users"; //TODO: zmienić na wyświetlanie tylko wyników wyszukiwania wśród wszystkich użytkowników
             }
             $result = $this->conn->query($query);
             $resultArray = $result -> fetchAll(PDO::FETCH_ASSOC);
