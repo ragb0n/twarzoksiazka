@@ -20,7 +20,8 @@ class Database
             $this->configurationValidation($config);
             $this->createConnection($config);
         }catch (PDOException $e){
-            throw new StorageException('Błąd połączenia z bazą danych');
+            echo $e;
+            throw new StorageException('Błąd połączeniz a bazą danych');
         }
     }
 
@@ -268,7 +269,6 @@ class Database
             }
         }catch(Throwable $e){
             dump($e);
-
             throw new StorageException("Błąd tworzenia konta!");
             dump($e);
         }
@@ -385,6 +385,7 @@ class Database
             }
             return $resultArray;
         }catch(Throwable $e){
+                echo $e;
             throw new StorageException("Nie udało się pobrac postów", 400, $e);
         }
 
@@ -407,6 +408,4 @@ class Database
             throw new ConfigurationException('Błąd konfiguracji połączenia');
         }
     }
-
-    
 }
