@@ -1,8 +1,7 @@
 <div>
     <form action="/?action=friends" method="post" id="userSearch">
         <input type="text" placeholder="Rozpocznij wyszukiwanie swoich znajomych tutaj" name="searchQuery" id="search">
-        <button type="submit" form="userSearch">Szukaj</button>
-
+        <button type="submit" form="userSearch" style="height: 4vh; width: 100%;">Szukaj</button>
     </form>
 
     Twoi znajomi
@@ -18,7 +17,7 @@
                             </div>
                         </div>
                     </div>
-                    <?php echo $friend['name'] . " " . $friend['surname'] ?>
+                    <p><?php echo $friend['name'] . " " . $friend['surname'] ?></p>
             </a>
             <?php endforeach ?>
     </div>
@@ -29,15 +28,14 @@
         <?php if($params['users'] != null): ?>
             <?php foreach($params['users'] as $user): ?>
             <a href="/?action=profile&id=<?php echo $user['user_id']; ?>" class="user_profile_href">
-
-                    <div class="profile_images">
-                        <div class="profile_images_background" style="background-image: url(data:image/jpg;charset=utf8;base64,<?php echo base64_encode($user['backgroundPhoto']); ?>);">
-                            <div class="profile_images_photo">
-                                <img src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($user['profilePhoto']); ?>">
-                            </div>
+                <div class="profile_images">
+                    <div class="profile_images_background" style="background-image: url(data:image/jpg;charset=utf8;base64,<?php echo base64_encode($user['backgroundPhoto']); ?>);">
+                        <div class="profile_images_photo">
+                            <img src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($user['profilePhoto']); ?>">
                         </div>
                     </div>
-                    <?php echo $user['name'] . " " . $user['surname'] ?>
+                </div>
+                <p><?php echo $user['name'] . " " . $user['surname'] ?></p>
             </a>
             <?php endforeach ?>
         <?php endif ?>

@@ -110,16 +110,18 @@ main {
 .post_options{
     display: inline-block;
     font-size: smaller;
+    vertical-align: bottom;
 }
 
-.post_options {
-    font-size: smaller;
-    vertical-align: bottom;
-
+.post_option{
+    display: inline;
+    float: left;
+    width: 4.5vw;
 }
 
-.post_options{
-    vertical-align: bottom;
+.post_option:hover{
+    background: lightgray;
+    transition: 0.5s;
 }
 
 .post_info_content{
@@ -219,6 +221,15 @@ button{
     padding: 0.15vw;
     cursor: pointer;
     margin-top: 0.2vh;
+}
+
+.post_options button{
+    background:none;
+    border:none;
+    margin:0;
+    padding:0;
+    cursor: pointer;
+    color: black;
 }
 
 .post_create{
@@ -444,3 +455,4 @@ input[type=radio] {
     cursor: pointer;
     margin-top: 0.2vh;
 }
+

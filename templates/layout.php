@@ -7,6 +7,7 @@
         <link href="public/style.css" rel="stylesheet">
         <link rel="icon" type="image/png" href="../public/images/favicon.png">
         <script src="https://kit.fontawesome.com/c97458608f.js" crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     </head>
 
     <body>

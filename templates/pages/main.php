@@ -32,13 +32,19 @@
                         <?php echo $params['logged_user_name'] . ' ' . $params['logged_user_surname']; ?>
                     </div>
                     <div class="post_date">
-                        20.04.2021, 19:10
+                        <script>
+                            var today = new Date();
+                            var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+                            var time = today.getHours() + ":" + today.getMinutes();
+                            var dateTime = date+' '+time;
+                            document.write(dateTime);
+                        </script>
                     </div>
                 </div>
             </div>
             <div class="post_content">
                 <form class="post_create_form" action="/?action=main" method="post" id="new_post_form">
-                <textarea name="new_post_text" form="new_post_form">Podziel się czymś ze swoimi znajomymi!</textarea>   
+                <textarea name="new_post_text" form="new_post_form" placeholder="Podziel się czymś ze swoimi znajomymi!"></textarea>   
                 </br>
                 <button type="submit" form="new_post_form">Opublikuj</button>
                 </form>
@@ -60,9 +66,19 @@
                 </div>
                 <?php if($post['author_id'] == $_SESSION['id']): ?>
                 <div class="post_info_content post_options">
-                    <a href=''>Edytuj</a>
-                     | 
-                    <a href=''>Usuń</a>
+                    <form method="post" id="postEdit">
+                        <input type="hidden" name="postEdit" value="edit">
+                        <button type="submit" form="postEdit" class="post_option">
+                            Edytuj post
+                        </button>
+                    </form>
+                    <form method="post" id="postDelete">
+                        <input type="hidden" name="postDelete" value="<?php echo $post['post_id'] ?>">
+                        <button type="submit" form="postDelete" class="post_option">
+                            Usuń post
+                        </button>
+                    </form>
+
                 </div>
                 <?php endif; ?>
             </div>

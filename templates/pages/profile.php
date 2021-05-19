@@ -26,7 +26,7 @@
         </div>
         <div class="profileSideMenu">
             <?php if ($params['profileData']['user_id'] == $_SESSION['id']): ?>
-            <a href="/">
+            <a href="/?action=editProfile">
                 <div class="profile_page_tile">
                     <i class="fas fa-cog"></i> Edytuj profil
                 </div>

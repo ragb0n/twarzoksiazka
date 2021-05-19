@@ -79,6 +79,11 @@ class Controller
                 ] ?? null;
 
             break;
+            case 'editProfile':
+                $page = 'editProfile';
+                $viewParams = [1];
+            
+            break;
             case 'groups':
                 $page = 'groups';
                 $viewParams = [1];
@@ -228,8 +233,12 @@ class Controller
 
                 $data = $this->getRequestPost();
 
-                if(!empty($data)){
+                if(isset($data['new_post_text'])){
                     $this->database->createPost(['new_post_text' => $data['new_post_text']]);
+                }
+
+                if(isset($data['postDelete'])) {
+                    $this->database->deletePost(intval($data['postDelete']));
                 }
 
                 $viewParams = [

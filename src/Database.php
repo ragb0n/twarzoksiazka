@@ -63,7 +63,7 @@ class Database
             $query = "UPDATE invitations SET accepted = true WHERE user_1_id = $user1Id AND user_2_id = $user2Id;";
             $this->conn->exec($query);
             $this->addFriend($user1Id, $user2Id);
-            header("Location: /?action=profile&id=$user2Id");
+            header("Location: /?action=profile&id=$user1Id");
         }catch(PDOException $e){
             dump($e);
             throw new StorageException("Błąd akceptowania zaproszenia!");
@@ -245,7 +245,7 @@ class Database
                 $this->conn->exec($query);
                 $newUserId = $this->conn->lastInsertId();
 
-                if(!empty($_FILES['newuser_profile_photo'])){
+                if(!empty($_FILES['newuser_profile_photo'])){ //TODO: Zrobić ustawianie domyślnego zdjęcia w przypadku jego braku w inny sposób
                     $photoUpload = $this->uploadPhoto('newuser_profile_photo', intval($newUserId), 1);
                     if($photoUpload['error'] == true){
                         $error[] = [
@@ -255,7 +255,7 @@ class Database
                     }
                 }
 
-                if(!empty($_FILES['newuser_background_photo'])){
+                if(!empty($_FILES['newuser_background_photo'])){ //TODO: Zrobić ustawianie domyślnego zdjęcia w przypadku jego braku w inny sposób
                     $photoUpload = $this->uploadPhoto('newuser_background_photo', intval($newUserId), 2);
                     if($photoUpload['error'] == true){
                         $error[] = [
@@ -356,6 +356,16 @@ class Database
             throw new StorageException('Wystapił błąd podczas dodawania nowego postu');
             dump($e);
             exit;
+        }
+    }
+
+    public function deletePost(int $postId): void{
+        try{
+            $query = "DELETE FROM posts WHERE post_id = $postId";
+            $this->conn->exec($query);
+            header("Location: /?action=main");
+        }catch(PDOException $e){
+            throw new StorageException("NIe udało sie usunąć posta!");
         }
     }
 
