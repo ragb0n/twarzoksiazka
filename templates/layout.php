@@ -7,6 +7,7 @@
         <link href="public/style.css" rel="stylesheet">
         <link rel="icon" type="image/png" href="../public/images/favicon.png">
         <script src="https://kit.fontawesome.com/c97458608f.js" crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     </head>
 
     <body>
@@ -16,7 +17,10 @@
             <?php if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] == true): ?>    
                 <ul>
                     <li>
-                        <a href="/?action=friends"><i class="fas fa-user-friends"></i> Znajomi</a>
+                        <a href="/?action=profile"><i class="fas fa-user-alt"></i> Profil</a>
+                    </li>
+                    <li>
+                        <a href="/?action=friends"><i class="fas fa-user-friends"></i> Ludzie</a>
                     </li>
                     <li>
                         <a href="/?action=groups"><i class="fas fa-users"></i> Grupy</a>
@@ -34,23 +38,17 @@
                         <a href="/?action=logout"><i class="fas fa-sign-out-alt"></i> Wyloguj</a>
                     </li>
                 </ul>
-            <?php elseif(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] != true): ?>
-                <ul>
-                    <li>
-                        <a href="/?action=login"><i class="fas fa-sign-out-alt"></i> Logowanie</a>
-                    </li>
-                    <li>
-                        <a href="/?action=register"><i class="fas fa-sign-out-alt"></i> Rejestracja</a>
-                    </li>
-                </ul>
             <?php endif; ?>
             </nav>
         </header>
         <main>
             <?php require_once("pages/$page.php"); ?>
         </main>
+
         <footer>
-            <i>twarzoksiążka 2021 - Patryk Marcinków</i>
+            <i>twarzoksiążka 2021 - V.0.5.4 - Patryk Marcinków</i>
+            <br>
+            <i>Ostatnia aktualizacja: 18.05.2021</i>
         </footer>
     </body>
 </html>
