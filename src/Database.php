@@ -20,8 +20,7 @@ class Database
             $this->configurationValidation($config);
             $this->createConnection($config);
         }catch (PDOException $e){
-            echo $e;
-            throw new StorageException('Błąd połączeniz a bazą danych');
+            throw new StorageException('Błąd połączenia z bazą danych');
         }
     }
 
@@ -269,6 +268,7 @@ class Database
             }
         }catch(Throwable $e){
             dump($e);
+
             throw new StorageException("Błąd tworzenia konta!");
             dump($e);
         }
@@ -381,14 +381,41 @@ class Database
             $resultArray = $result->fetchAll(PDO::FETCH_ASSOC); //fetchAll() zastepuje foreach, zwraca tablicę, fetch() pobiera tylko pierwszy element zwrócony przez zapytanie
 
             foreach($resultArray as &$post){
+                $post['reactions'] = $this->countReactions(intval($post['post_id']));
                 $post['authorPhoto'] = $this->getPhotos(intval($post['author_id']), null, 1)['image'];
             }
             return $resultArray;
         }catch(Throwable $e){
-                echo $e;
+            dump($e);
             throw new StorageException("Nie udało się pobrac postów", 400, $e);
         }
 
+    }
+
+    public function reactionAddDelete(int $userId, int $postId): void{
+        if(!$this->checkReactions($userId, $postId)){ //jeżeli dany użytkownik jeszcze nie dał reakcji danemu postowi - dodaj reakcję...
+            $query = "INSERT INTO reactions VALUES ($userId, $postId)";
+            $this->conn->exec($query);
+        }else{ //...a jeżeli już dał, to usuń reakcję
+            $query = "DELETE FROM reactions WHERE user_id = $userId AND post_id = $postId";
+            $this->conn->exec($query);
+        }
+    }
+
+    public function checkReactions(int $userId, int $postId): bool{
+        $query = "SELECT COUNT(*) FROM reactions WHERE user_id = $userId AND post_id = $postId";
+        $result = $this->conn->query($query);
+        if($result->fetchColumn(0) == 0){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    public function countReactions(int $postId): string{
+        $query = "SELECT COUNT(*) FROM reactions WHERE post_id = $postId";
+        $result = $this->conn->query($query);
+        return $result->fetchColumn(0);
     }
 
     private function createConnection(array $config): void
@@ -408,4 +435,6 @@ class Database
             throw new ConfigurationException('Błąd konfiguracji połączenia');
         }
     }
+
+    
 }

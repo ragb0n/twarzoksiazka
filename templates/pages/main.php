@@ -51,7 +51,7 @@
             </div>
         </div>
         <?php foreach($params['posts'] ?? [] as $post): ?>
-        <div class="post">
+        <div class="post" id="postId=<?php echo $post['post_id']; ?>">
             <div class="post_info">
                 <div class="post_info_content post_author_image">
                     <img src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($post['authorPhoto']); ?>">
@@ -65,27 +65,47 @@
                     </div>
                 </div>
                 <?php if($post['author_id'] == $_SESSION['id']): ?>
-                <div class="post_info_content post_options">
-                    <form method="post" id="postEdit">
-                        <input type="hidden" name="postEdit" value="edit">
-                        <button type="submit" form="postEdit" class="post_option">
-                            Edytuj post
-                        </button>
-                    </form>
-                    <form method="post" id="postDelete">
-                        <input type="hidden" name="postDelete" value="<?php echo $post['post_id'] ?>">
-                        <button type="submit" form="postDelete" class="post_option">
-                            Usuń post
-                        </button>
-                    </form>
+                    <div class="post_info_content post_options">
+                        <form method="post" id="postEdit">
+                            <input type="hidden" name="postEdit" value="edit">
+                            <button type="submit" form="postEdit" class="post_option">
+                                Edytuj post
+                            </button>
+                        </form>
+                        <form method="post" id="postDelete">
+                            <input type="hidden" name="postDelete" value="<?php echo $post['post_id'] ?>">
+                            <button onclick="confirm('Na pewno chcesz usunąc tego posta?')" type="submit" form="postDelete" class="post_option">
+                                Usuń post
+                            </button>
+                        </form>
 
-                </div>
+                    </div>
                 <?php endif; ?>
             </div>
             <div class="post_content">
                 <?php echo nl2br(htmlentities($post['post_text'])); ?>
             </div>
+            <div class="reactions-counter">
+                    <button onclick="sendReact(<?php echo $post['post_id']; ?>)">
+                        Daję lajka! <i class="fas fa-thumbs-up" style="color: #103A6E; padding: 0 0.5vw 0 0.5vw;"></i><span id="reactionCounter"></span><?php echo (htmlentities($post['reactions'])); ?>
+                    </button>
+                </form>
+            </div>
         </div>
         <?php endforeach; ?>
     </div> 
 </div>
+
+<script>
+    function sendReact(postId){
+        $.ajax({
+            type: 'POST',
+            data: `react=${postId}`,
+            url: '/?action=main',
+            success: function() {   
+                location.reload();
+            }
+        });
+    }
+</script>
+

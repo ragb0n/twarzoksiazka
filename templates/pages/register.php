@@ -6,7 +6,6 @@
                 Informacje obowiązkowe
                 <br>
                 <br>
-
                         <div>
                                 <label>Imię</label><span class="required_field">*</span> 
                                 <?php if($params['register_error']['name_error'] == true): ?>
@@ -90,9 +89,7 @@
                                 <label for="kobieta">Kobieta</label>
                                 <input class="radio_label" type="radio" id="kobieta" value="kobieta" name="newuser_sex" class="register_form_field">
                         </div>
-
                         <br>
-
                         <input  style="width: 5%" type="checkbox" id="accepted" name="rules" value="accepted" >
                         <label for="accepted"> 
                                 <span class="required_field">*</span> Oświadczam, że zapoznałem/am się z Regulaminem Serwisu <i>twarzoksiążka</i> (którego nie ma) i akceptuję wszystkie zawarte w nim warunki.
@@ -100,10 +97,8 @@
                         <?php if($params['register_error']['rules_error'] == true): ?>
                                 <span class="registration_error">Aby założyć konto, musisz akceptować regulamin serwisu!</span>
                         <?php endif; ?>
-
                         <br>
                         <br>
-
                 </div>
                 <div class="register_optional">
                         Informacje dodatkowe
@@ -151,5 +146,4 @@
                         <button type="submit" form="register_form">Rejestracja</button>
                 </div>
         </form>  
-        
 </div>

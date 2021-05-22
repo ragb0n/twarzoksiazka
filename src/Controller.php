@@ -13,12 +13,11 @@ require_once('Database.php');
 class Controller
 {
     private const DEFAULT_ACTION = 'main';
-
     private static array $configuration = [];
-
     private array $request;
     private Database $database;
     private View $view;
+
     public static function initConfigurtion(array $configuration): void
     {
         self::$configuration = $configuration;
@@ -40,6 +39,7 @@ class Controller
                 $dataGet = $this->getRequestGet();
                 $dataPost = $this->getRequestPost();
                 $page = 'profile';
+
                 if(!isset($dataGet['id'])){
                     $viewParams = $this->getProfileData(intval($_SESSION['id']));
                 }else{
@@ -60,12 +60,17 @@ class Controller
                         if(isset($dataPost['invite']) && $dataPost['invite'] == 'delete'){
                             $this->database->deleteFriend($_SESSION['id'], $dataGet['id']);
                         }
-                        };
+                    };
                 }
+                if(isset($dataPost['react'])) {
+                    $this->database->reactionAddDelete(intval($_SESSION['id']), intval($dataPost['react']));
+                }
+
             break;
             case 'friends':
                 $page = 'friends';
                 $data = $this->getRequestPost();
+
                 if(!empty($data)){
                     $resultsFriends = $this->database->getUserProfiles($data['searchQuery'], $_SESSION['id']);
                     $resultsAllUsers = $this->database->getUserProfiles($data['searchQuery'], null);
@@ -136,6 +141,7 @@ class Controller
                 $viewParams = [
                     'login_error' => $this->loginStatus ?? "&nbsp"
                 ];
+                
             break;
             case 'register':
                 $page = 'register';
@@ -225,7 +231,7 @@ class Controller
             break;
             default:
                 $page = 'main';
-                
+
                 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
                     header("Location: /?action=login");
                     exit;
@@ -239,6 +245,10 @@ class Controller
 
                 if(isset($data['postDelete'])) {
                     $this->database->deletePost(intval($data['postDelete']));
+                }
+
+                if(isset($data['react'])) {
+                    $this->database->reactionAddDelete(intval($_SESSION['id']), intval($data['react']));
                 }
 
                 $viewParams = [

@@ -14,23 +14,49 @@
             </div>
             <br>
             <div class="profile_into_data">
-                <?php if(!empty($params['profileData']['city'])): ?><div>Mieszka w: <?php echo $params['profileData']['city']; ?></div><?php endif; ?>
-                <?php if(!empty($params['profileData']['birth_place'])): ?><div>Pochodzi z: <?php echo $params['profileData']['birth_place']; ?></div><?php endif; ?>
-                <div>Urodziny: <?php echo $params['profileData']['birth_date']; ?></div>
-                <?php if(!empty($params['profileData']['school'])): ?><div>Szkoła: <?php echo $params['profileData']['school']; ?></div><?php endif; ?>
-                <?php if(!empty($params['profileData']['work'])): ?><div>Praca: <?php echo $params['profileData']['work']; ?></div><?php endif; ?>
-                <div>Data dołączenia: <?php echo $params['profileData']['creation_date']; ?></div>
-                <?php if(!empty($params['profileData']['hobby'])): ?><div>Hobby: <?php echo $params['profileData']['hobby']; ?></div><?php endif; ?>
-                <?php if(!empty($params['profileData']['about'])): ?><div>O mnie: <?php echo $params['profileData']['about']; ?></div><?php endif; ?>
+                <?php if(!empty($params['profileData']['city'])): ?>
+                    <div>
+                        Mieszka w: <?php echo $params['profileData']['city']; ?>
+                    </div>
+                <?php endif; ?>
+                <?php if(!empty($params['profileData']['birth_place'])): ?>
+                    <div>
+                        Pochodzi z: <?php echo $params['profileData']['birth_place']; ?>
+                    </div>
+                <?php endif; ?>
+                <div>
+                    Urodziny: <?php echo $params['profileData']['birth_date']; ?>
+                </div>
+                <?php if(!empty($params['profileData']['school'])): ?>
+                    <div>Szkoła: <?php echo $params['profileData']['school']; ?></div>
+                <?php endif; ?>
+                <?php if(!empty($params['profileData']['work'])): ?>
+                    <div>
+                        Praca: <?php echo $params['profileData']['work']; ?>
+                    </div>
+                <?php endif; ?>
+                <div>
+                    Data dołączenia: <?php echo $params['profileData']['creation_date']; ?>
+                </div>
+                <?php if(!empty($params['profileData']['hobby'])): ?>
+                    <div>
+                        Hobby: <?php echo $params['profileData']['hobby']; ?>
+                    </div>
+                <?php endif; ?>
+                <?php if(!empty($params['profileData']['about'])): ?>
+                    <div>
+                        O mnie: <?php echo $params['profileData']['about']; ?>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
         <div class="profileSideMenu">
             <?php if ($params['profileData']['user_id'] == $_SESSION['id']): ?>
-            <a href="/?action=editProfile">
-                <div class="profile_page_tile">
-                    <i class="fas fa-cog"></i> Edytuj profil
-                </div>
-            </a>
+                <a href="/?action=editProfile">
+                    <div class="profile_page_tile">
+                        <i class="fas fa-cog"></i> Edytuj profil
+                    </div>
+                </a>
             <?php else: ?>
                 <?php if($params['friendStatus'] == 1): ?>
                     <form method="post" id="inviteButton">
@@ -40,7 +66,7 @@
                                 <div style="display: inline-block">
                                     Jesteście znajomymi
                                     </br>
-                                    <small>Kliknij aby usunąć znajomego </small>
+                                    <small>Kliknij aby usunąć znajomego</small>
                                 </div>
                         </button>
                     </form>
@@ -90,11 +116,11 @@
     <div class="profile_content_right">
         <div class="profile_posts">
             <div class="profile_post">
-                <div class="post_content profile_posts_header">
+                <div class="post_content profile_posts_header" style="font-size: 1.2vw;">
                     Posty użytkownika <?php echo htmlentities($params['profileData']['name']); ?>
                 </div>
             </div>
-        <?php foreach($params['posts'] ?? [] as $post): ?>
+            <?php foreach($params['posts'] ?? [] as $post): ?>
             <div class="profile_post">
                 <div class="post_info">
                     <div class="post_info_content post_author_image">
@@ -110,17 +136,32 @@
                     </div>
                     <?php if($post['author_id'] == $_SESSION['id']): ?>
                     <div class="post_info_content post_options">
-                        <a href=''>Edytuj</a>
-                         | 
-                        <a href=''>Usuń</a>
+                        <form method="post" id="postEdit">
+                            <input type="hidden" name="postEdit" value="edit">
+                            <button type="submit" form="postEdit" class="post_option">
+                                Edytuj post
+                            </button>
+                        </form>
+                        <form method="post" id="postDelete">
+                            <input type="hidden" name="postDelete" value="<?php echo $post['post_id'] ?>">
+                            <button type="submit" form="postDelete" class="post_option">
+                                Usuń post
+                            </button>
+                        </form>
+
                     </div>
-                    <?php endif; ?>
+                <?php endif; ?>
                 </div>
                 <div class="post_content">
                     <?php echo nl2br(htmlentities($post['post_text'])); ?>
                 </div>
+                <div class="reactions-counter">
+                    <button onclick="sendReact(<?php echo $post['post_id']; ?>)">
+                        Daję lajka! <i class="fas fa-thumbs-up" style="color: #103A6E; padding: 0 0.5vw 0 0.5vw;"></i><span id="reactionCounter"></span><?php echo (htmlentities($post['reactions'])); ?>
+                    </button>
+                </div>
             </div>
-        <?php endforeach ?>
+            <?php endforeach ?>
         </div>
     </div>
 </div>
