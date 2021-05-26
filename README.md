@@ -6,6 +6,7 @@
 * [Setup](#setup)
 * [Screenshots](#screenshots)
 * [Features](#features)
+* [To Do](#to-do)
 * [Project status](#project-status)
 * [Sources](#sources)
 
@@ -26,7 +27,27 @@ Soon
 Soon
 
 ## Features
-Soon
+* create user account
+* login to your account
+* write public posts
+* delete your post
+* react to posts
+* view other users profiles
+* searching for people among friends and all users
+* invite other users to friends
+
+## To Do
+* implement AJAX 
+* improve exception handling
+* create simple notification system
+* limit posts seen on main feed to friends only
+* allow users to edit and delte their accounts
+* allow users to edit their posts
+* allow users to upload more photos (Gallery)
+* create "Groups" page (create, edit, delete groups; invite others to join; join groups)
+* create "Events" page (create, edit, delete events; invite others to join; join events)
+* create "Pages" chat  (create, edit, delete pages; invite others to join; join pages)
+* create simple chat 
 
 ##Project status
 Soon
