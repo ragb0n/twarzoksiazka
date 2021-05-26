@@ -39,6 +39,7 @@ Soon
 ## To Do
 * implement AJAX 
 * improve exception handling
+* add remind password function
 * create simple notification system
 * limit posts seen on main feed to friends only
 * allow users to edit and delte their accounts
