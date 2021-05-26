@@ -49,7 +49,7 @@ Soon
 * create "Pages" chat  (create, edit, delete pages; invite others to join; join pages)
 * create simple chat 
 
-##Project status
+## Project status
 Soon
 
 ## Sources
