@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
+use App\Request;
 use App\Exception\ConfigurationException;
 
 require_once('Exceptions/ConfigurationException.php');
@@ -14,7 +15,7 @@ class Controller
 {
     private const DEFAULT_ACTION = 'main';
     private static array $configuration = [];
-    private array $request;
+    private Request $request;
     private Database $database;
     private View $view;
 
@@ -23,7 +24,7 @@ class Controller
         self::$configuration = $configuration;
     }
 
-    public function __construct(array $request){
+    public function __construct(Request $request){
         if(empty(self::$configuration['db'])){
             throw new ConfigurationException ('Błąd konfiguracji');
         }
@@ -32,251 +33,291 @@ class Controller
         $this->view = new View();
     }
 
-    public function run(): void
-    {
-        switch($this->action()){
-            case 'profile':
-                $dataGet = $this->getRequestGet();
-                $dataPost = $this->getRequestPost();
-                $page = 'profile';
+    public function profile(){
+        $page = 'profile';
 
-                if(!isset($dataGet['id'])){
-                    $viewParams = $this->getProfileData(intval($_SESSION['id']));
-                }else{
-                    $viewParams = $this->getProfileData(intval($dataGet['id']));
-                    $viewParams['friendStatus'] = $this->database->checkIfAlreadyFriend($_SESSION['id'], $dataGet['id']);
-                    if($viewParams['friendStatus'] == false){
-                        $viewParams['isInvited'] = $this->database->checkIfInvited($_SESSION['id'], $dataGet['id']);
-                        $viewParams['pendingInvitation'] = $this->database->checkIfInvited($dataGet['id'], $_SESSION['id']);
-                        if(isset($dataPost['invite']) && $dataPost['invite'] == 'send'){
-                            $this->database->sendInvitation($_SESSION['id'], $dataGet['id']);
-                        }
-                        if(isset($dataPost['invite']) && $dataPost['invite'] == 'abort'){
-                            $this->database->abortInvitation($_SESSION['id'], $dataGet['id']);
-                        }
-                        if(isset($dataPost['invite']) && $dataPost['invite'] == 'accept'){
-                            $this->database->acceptInvitation($dataGet['id'], $_SESSION['id']);
-                        }
-                        if(isset($dataPost['invite']) && $dataPost['invite'] == 'delete'){
-                            $this->database->deleteFriend($_SESSION['id'], $dataGet['id']);
-                        }
-                    };
+        if($this->request->getRequestGet('id') == null){
+            $viewParams = $this->getProfileData(intval($_SESSION['id']));
+        }else{
+            $otherUserId = $this->request->getRequestGet('id');
+            $viewParams = $this->getProfileData(intval($otherUserId));
+            $viewParams['friendStatus'] = $this->database->checkIfAlreadyFriend($_SESSION['id'], $otherUserId);
+            if($viewParams['friendStatus'] == false){
+                $viewParams['isInvited'] = $this->database->checkIfInvited($_SESSION['id'], $otherUserId);
+                $viewParams['pendingInvitation'] = $this->database->checkIfInvited($otherUserId, $_SESSION['id']);
+                $dataPost['invite'] = $this->request->getRequestPost('invite') ?? null;
+                if(isset($dataPost['invite']) && $dataPost['invite'] == 'send'){
+                    $this->database->sendInvitation($_SESSION['id'], $otherUserId);
                 }
-                if(isset($dataPost['react'])) {
-                    $this->database->reactionAddDelete(intval($_SESSION['id']), intval($dataPost['react']));
+                if(isset($dataPost['invite']) && $dataPost['invite'] == 'abort'){
+                    $this->database->abortInvitation($_SESSION['id'], $otherUserId);
                 }
-
-            break;
-            case 'friends':
-                $page = 'friends';
-                $data = $this->getRequestPost();
-
-                if(!empty($data)){
-                    $resultsFriends = $this->database->getUserProfiles($data['searchQuery'], $_SESSION['id']);
-                    $resultsAllUsers = $this->database->getUserProfiles($data['searchQuery'], null);
-                }else{
-                    $resultsFriends = $this->database->getUserProfiles(null, $_SESSION['id']);
-                    $resultsAllUsers = $this->database->getUserProfiles(null, null);
+                if(isset($dataPost['invite']) && $dataPost['invite'] == 'accept'){
+                    $this->database->acceptInvitation($otherUserId, $_SESSION['id']);
                 }
-                $viewParams = [
-                    "friends" => $resultsFriends,
-                    "users" => $resultsAllUsers
-                ] ?? null;
-
-            break;
-            case 'editProfile':
-                $page = 'editProfile';
-                $viewParams = [1];
-            
-            break;
-            case 'groups':
-                $page = 'groups';
-                $viewParams = [1];
-
-            break;
-            case 'pages':
-                $page = 'pages';
-                $viewParams = [1];
-
-            break;
-            case 'events':
-                $page = 'events';
-                $viewParams = [1];
-
-            break;
-            case 'messages':
-                $page = 'messages';
-                $viewParams = [1];
-
-            break;           
-            case 'logout':
-                $page = 'logout';
-                $viewParams = [1];
-            break; 
-            case 'login';
-                $page = 'login';
-
-                if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
-                    header("Location: /?action=main");
-                    exit;
-                }else{
-                    $data = $this->getRequestPost();
-                    if(!empty($data)){
-                        if(empty(trim($data['username']))){
-                            $viewParams['login_error'] = "Podaj swój login";
-                            break;
-                        }else{
-                            if(empty(trim($data['password']))){
-                                $viewParams['login_error'] = "Podaj swoje hasło";
-                                break;
-                            }else{
-                                $this->loginStatus = $this->database->login([
-                                    'username' => trim($data['username']),
-                                    'password' => $data['password']
-                                ]);
-                            }
-                        }
-                    }
+            }else{
+                $dataPost['invite'] = $this->request->getRequestPost('invite') ?? null;
+                if(isset($dataPost['invite']) && $dataPost['invite'] == 'delete'){
+                    $this->database->deleteFriend($_SESSION['id'], $otherUserId);
                 }
-                $viewParams = [
-                    'login_error' => $this->loginStatus ?? "&nbsp"
-                ];
-                
-            break;
-            case 'register':
-                $page = 'register';
-                $errorFlag = false;
-                $viewParams['register_error'] = [
-                    'name_error' => false,
-                    'surname_error' => false,
-                    'email_error' => false,
-                    'birthdate_error' => false,
-                    'username_error' => false,
-                    'password_error' => false,
-                    'password_repeat_error' => false,
-                    'different_passwords_error' => false,
-                    'sex_error' => false,
-                    'rules_error' => false,
-                    'database_answer' => null
-                ];
-                if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
-                    header("Location: /?action=main");
-                    exit;
-                }else{
-
-                    $data = $this->getRequestPost();
-                    if(!empty($data)){
-
-                        if(empty(trim($data['newuser_name']))){
-                            $viewParams['register_error']['name_error'] = true;
-                            $errorFlag = true;
-                        }
-                        if(empty(trim($data['newuser_surname']))){
-                            $viewParams['register_error']['surname_error'] = true;
-                            $errorFlag = true;
-                        }
-                        if(empty(trim($data['newuser_email']))){
-                            $viewParams['register_error']['email_error'] = true;
-                            $errorFlag = true;
-                        }
-                        if(empty(trim($data['newuser_birthDate']))){
-                            $viewParams['register_error']['birthdate_error'] = true;
-                            $errorFlag = true;
-                        }
-                        if(empty(trim($data['newuser_username']))){
-                            $viewParams['register_error']['username_error'] = true;
-                            $errorFlag = true;
-                        }
-                        if(empty($data['newuser_password'])){
-                            $viewParams['register_error']['password_error'] = true;
-                            $errorFlag = true;
-                        }
-                        if(empty($data['newuser_password_repeat'])){
-                            $viewParams['register_error']['password_repeat_error'] = true;
-                            $errorFlag = true;
-                        }
-                        if(!empty($data['newuser_password']) && !empty($data['newuser_password_repeat']) && $data['newuser_password'] != $data['newuser_password_repeat']){
-                            $viewParams['register_error']['different_passwords_error'] = true;
-                            $errorFlag = true;
-                        }
-                        if(empty($data['newuser_sex'])){
-                            $viewParams['register_error']['sex_error'] = true;
-                            $errorFlag = true;
-                        }
-                        if(empty($data['rules'])){
-                            $viewParams['register_error']['rules_error'] = true;
-                            $errorFlag = true;
-                        }
-                        if($errorFlag == true){
-                            break;
-                        }else{
-                            $viewParams['register_error']['database_answer'] = $this->database->createAccount([
-                                'newuser_name' => trim($data['newuser_name']),
-                                'newuser_surname' => trim($data['newuser_surname']),
-                                'newuser_email' => trim($data['newuser_email']),
-                                'newuser_birthDate' => $data['newuser_birthDate'],
-                                'newuser_city' => trim($data['newuser_city']),
-                                'newuser_username' => trim($data['newuser_username']),
-                                'newuser_password' => $data['newuser_password'],
-                                'newuser_sex' => $data['newuser_sex'],
-                                'newuser_birth_place' => trim($data['newuser_birth_place']),
-                                'newuser_school' => trim($data['newuser_school']),
-                                'newuser_work' => trim($data['newuser_work']),
-                                'newuser_hobby' => trim($data['newuser_hobby']),
-                                'newuser_about' => trim($data['newuser_about'])
-                            ]);
-                        }
-                    }
-                }
-            break;
-            default:
-                $page = 'main';
-
-                if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
-                    header("Location: /?action=login");
-                    exit;
-                }
-
-                $data = $this->getRequestPost();
-
-                if(isset($data['new_post_text'])){
-                    $this->database->createPost(['new_post_text' => $data['new_post_text']]);
-                }
-
-                if(isset($data['postDelete'])) {
-                    $this->database->deletePost(intval($data['postDelete']));
-                }
-
-                if(isset($data['react'])) {
-                    $this->database->reactionAddDelete(intval($_SESSION['id']), intval($data['react']));
-                }
-
-                $viewParams = [
-                    'posts' => $this->database->getPosts(null),
-                    'logged_user_name' => $_SESSION['name'],
-                    'logged_user_surname' => $_SESSION['surname'],
-                    'profilePhoto' => $this->database->getPhotos(intval($_SESSION['id']), null, 1),
-                    'backgroundPhoto' => $this->database->getPhotos(intval($_SESSION['id']), null, 2),
-                ];
-            break; 
+            }
+        }
+        if($this->request->getRequestPost('react') !== null) {
+            $this->database->reactionAddDelete(intval($_SESSION['id']), intval($this->request->getRequestPost('react')));
         }
         $this->view->render($page, $viewParams ?? null);
     }
 
-    public function action(): string //metoda pobierająca przez getRequestGet zawartość tablicy _GET i zwracająca z niej wartości dla kolumny action
-    {
-        $data = $this->getRequestGet();
-        return $data['action'] ?? self::DEFAULT_ACTION;
+    public function friends(){
+        $page = 'friends';
+
+        if($this->request->getRequestPost('searchQuery') !== null){
+            $searchQuery = $this->request->getRequestPost('searchQuery');
+            $resultsFriends = $this->database->getUserProfiles($searchQuery, $_SESSION['id']);
+            $resultsAllUsers = $this->database->getUserProfiles($searchQuery, null);
+        }else{
+            $resultsFriends = $this->database->getUserProfiles(null, $_SESSION['id']);
+            $resultsAllUsers = $this->database->getUserProfiles(null, null);
+        }
+        $viewParams = [
+            "friends" => $resultsFriends,
+            "users" => $resultsAllUsers
+        ] ?? null;
+        $this->view->render($page, $viewParams ?? null);
     }
     
-    private function getRequestPost(): array
-    {
-        return $this->request['post'] ?? [];
+    public function login(){
+        $page = 'login';
+        
+        if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
+            header("Location: /?action=main");
+            exit;
+        }else{
+            if($this->request->getRequestPost('username') == null || $this->request->getRequestPost('password') == null){
+                if($this->request->getRequestPost('username') == null){
+                    $viewParams['username_error'] = "Podaj swój login";
+                }
+                if($this->request->getRequestPost('password') == null){
+                    $viewParams['password_error'] = "Podaj swoje hasło";
+                }
+            }elseif($this->request->getRequestPost('username') != null && $this->request->getRequestPost('password') != null){
+                $viewParams['login_error'] = $this->database->login([
+                    'username' => trim($this->request->getRequestPost('username')),
+                    'password' => $this->request->getRequestPost('password')
+                ]);
+            }
+            $this->view->render($page, $viewParams ?? null);
+        }
     }
 
-    private function getRequestGet(): array
+    public function register(){
+        $page = 'register';
+        $errorFlag = false;
+        $viewParams['register_error'] = [
+            'name_error' => false,
+            'surname_error' => false,
+            'email_error' => false,
+            'birthdate_error' => false,
+            'username_error' => false,
+            'password_error' => false,
+            'password_repeat_error' => false,
+            'different_passwords_error' => false,
+            'sex_error' => false,
+            'rules_error' => false,
+            'database_answer' => null
+        ];
+        if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
+            header("Location: /?action=main");
+            exit;
+        }else{
+
+            if(
+                $this->request->getRequestPost('newuser_name') != null ||
+                $this->request->getRequestPost('newuser_surname') != null ||
+                $this->request->getRequestPost('newuser_email') != null ||
+                $this->request->getRequestPost('newuser_birthdate') != null ||
+                $this->request->getRequestPost('newuser_username') != null ||
+                $this->request->getRequestPost('newuser_password') != null ||
+                $this->request->getRequestPost('newuser_password_repeat') != null ||
+                $this->request->getRequestPost('newuser_sex') != null ||
+                $this->request->getRequestPost('rules') != null
+            ){
+
+                if(trim($this->request->getRequestPost('newuser_name')) == null){
+                    $viewParams['register_error']['name_error'] = true;
+                    $errorFlag = true;
+                }
+                if(trim($this->request->getRequestPost('newuser_surname')) == null){
+                    $viewParams['register_error']['surname_error'] = true;
+                    $errorFlag = true;
+                }
+                if(trim($this->request->getRequestPost('newuser_email')) == null){
+                    $viewParams['register_error']['email_error'] = true;
+                    $errorFlag = true;
+                }
+                if(trim($this->request->getRequestPost('newuser_birthDate')) == null){
+                    $viewParams['register_error']['birthdate_error'] = true;
+                    $errorFlag = true;
+                }
+                if(trim($this->request->getRequestPost('newuser_username')) == null){
+                    $viewParams['register_error']['username_error'] = true;
+                    $errorFlag = true;
+                }
+                if($this->request->getRequestPost('newuser_password') == null){
+                    $viewParams['register_error']['password_error'] = true;
+                    $errorFlag = true;
+                }
+                if($this->request->getRequestPost('newuser_password_repeat') == null){
+                    $viewParams['register_error']['password_repeat_error'] = true;
+                    $errorFlag = true;
+                }
+                if($this->request->getRequestPost('newuser_password') != null && $this->request->getRequestPost('newuser_password_repeat') != null && $this->request->getRequestPost('newuser_password') != $this->request->getRequestPost('newuser_password_repeat')){
+                    $viewParams['register_error']['different_passwords_error'] = true;
+                    $errorFlag = true;
+                }
+                if($this->request->getRequestPost('newuser_sex') == null){
+                    $viewParams['register_error']['sex_error'] = true;
+                    $errorFlag = true;
+                }
+                if($this->request->getRequestPost('rules') == null){
+                    $viewParams['register_error']['rules_error'] = true;
+                    $errorFlag = true;
+                }
+                if($errorFlag == true){
+                    header("Reload:0");
+                }else{
+                    $viewParams['register_error']['database_answer'] = $this->database->createAccount([
+                        'newuser_name' => trim($this->request->getRequestPost('newuser_name')),
+                        'newuser_surname' => trim($this->request->getRequestPost('newuser_surname')),
+                        'newuser_email' => trim($this->request->getRequestPost('newuser_email')),
+                        'newuser_birthDate' => $this->request->getRequestPost('newuser_birthDate'),
+                        'newuser_city' => trim($this->request->getRequestPost('newuser_city')),
+                        'newuser_username' => trim($this->request->getRequestPost('newuser_username')),
+                        'newuser_password' => $this->request->getRequestPost('newuser_password'),
+                        'newuser_sex' => $this->request->getRequestPost('newuser_sex'),
+                        'newuser_birth_place' => trim($this->request->getRequestPost('newuser_birth_place')),
+                        'newuser_school' => trim($this->request->getRequestPost('newuser_school')),
+                        'newuser_work' => trim($this->request->getRequestPost('newuser_work')),
+                        'newuser_hobby' => trim($this->request->getRequestPost('newuser_hobby')),
+                        'newuser_about' => trim($this->request->getRequestPost('newuser_about'))
+                    ]);
+                }
+            }
+        }
+        $this->view->render($page, $viewParams ?? null);
+    }
+
+    public function main(){
+        $page = 'main';
+
+        if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+            header("Location: /?action=login");
+            exit;
+        }
+
+        if($this->request->getRequestPost('new_post_text') !== null){
+            $this->database->createPost(['new_post_text' => $this->request->getRequestPost('new_post_text')]);
+        }
+
+        if($this->request->getRequestPost('postDelete') !== null) {
+            $this->database->deletePost(intval($this->request->getRequestPost('postDelete')));
+        }
+
+        if($this->request->getRequestPost('react') !== null) {
+            $this->database->reactionAddDelete(intval($_SESSION['id']), intval($this->request->getRequestPost('react')));
+        }
+
+        $viewParams = [
+            'posts' => $this->database->getPosts(null),
+            'logged_user_name' => $_SESSION['name'],
+            'logged_user_surname' => $_SESSION['surname'],
+            'profilePhoto' => $this->database->getPhotos(intval($_SESSION['id']), null, 1),
+            'backgroundPhoto' => $this->database->getPhotos(intval($_SESSION['id']), null, 2),
+        ];
+        $this->view->render($page, $viewParams ?? null);
+    }
+
+    public function groups(){
+        $page = 'groups';
+        $viewParams = [1];
+        $this->view->render($page, $viewParams ?? null);
+    }
+
+    public function pages(){
+        $page = 'pages';
+        $viewParams = [1];
+        $this->view->render($page, $viewParams ?? null);
+    }
+
+    public function logout(){
+        $page = 'logout';
+        $viewParams = [1];
+        $this->view->render($page, $viewParams ?? null);
+    }
+
+    public function editProfile(){
+        $page = 'editProfile';
+
+        $viewParams = [
+            'currentInfo' => $this->database->getProfileInfo(intval($_SESSION['id']))
+        ];
+        $this->view->render($page, $viewParams ?? null);
+    }
+
+    public function events(){
+        $page = 'events';
+        $viewParams = [1];
+        $this->view->render($page, $viewParams ?? null);
+    }
+
+    public function messages(){
+        $page = 'messages';
+        $viewParams = [1];
+        $this->view->render($page, $viewParams ?? null);
+    }
+
+    public function run(): void
     {
-        return $this->request['get'] ?? [];
+        switch($this->action()){
+            case 'profile':
+                $this->profile();
+            break;
+            case 'friends':
+                $this->friends();
+            break;
+            case 'editProfile':
+                $this->editProfile();
+            break;
+            case 'groups':
+                $this->groups();
+            break;
+            case 'pages':
+                $this->pages();
+            break;
+            case 'events':
+                $this->events();
+            break;
+            case 'messages':
+                $this->messages();
+            break;           
+            case 'logout':
+                $this->logout();
+            break; 
+            case 'login';
+                $this->login();
+            break;
+            case 'register':
+                $this->register();
+            break;
+            default:
+                $this->main();
+            break; 
+        }
+    }
+
+    public function action(): string //metoda pobierająca przez getRequestGet zawartość tablicy _GET i zwracająca z niej wartości dla kolumny action
+    {
+        return $this->request->getRequestGet('action', self::DEFAULT_ACTION);
     }
 
     private function getProfileData(?int $currentUserId){

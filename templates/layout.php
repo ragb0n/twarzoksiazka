@@ -47,9 +47,9 @@
             <?php require_once("pages/$page.php"); ?>
         </main>
         <footer>
-            <i>twarzoksiążka 2021 - V.0.5.4 - Patryk Marcinków</i>
+            <i>twarzoksiążka 2021 - Patryk Marcinków</i>
             <br>
-            <i>Ostatnia aktualizacja: 18.05.2021</i>
+            <i>Ostatnia aktualizacja: 22.05.2021</i>
         </footer>
         <script>
         function sendReact(postId){

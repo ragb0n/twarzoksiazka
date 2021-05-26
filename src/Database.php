@@ -103,7 +103,7 @@ class Database
         try{
             $query = "DELETE FROM friends WHERE (user_id_1 = $user1Id AND user_id_2 = $user2Id) OR (user_id_1 = $user2Id AND user_id_2 = $user1Id)";
             $this->conn->exec($query);
-            return true;
+            header("Location: /?action=profile&id=$user2Id");
         }catch(PDOException $e){
             dump($e);
             throw new StorageException("Błąd sprawdzania statusu");
@@ -126,14 +126,18 @@ class Database
     public function getUserProfiles(?string $searchQuote, ?string $userId): array
     {
         try{
-            if(isset($userId)){
+            if(isset($userId)){ //TODO: Przerobić pętlę
                 if(isset($searchQuote)){
                     $query = "SELECT DISTINCT user_id, name, surname FROM users, friends WHERE (name = '$searchQuote' OR surname = '$searchQuote' OR CONCAT(name, ' ', surname) = '$searchQuote') AND ((friends.user_id_1 = $userId AND friends.user_id_2 = users.user_id) OR (friends.user_id_2 = $userId AND friends.user_id_1 = users.user_id));";
                 }else{
                     $query = "SELECT user_id, name, surname FROM users, friends WHERE (friends.user_id_1 = $userId AND friends.user_id_2 = users.user_id) OR (friends.user_id_2 = $userId AND friends.user_id_1 = users.user_id);";
                 }
             }else{
-                $query = "SELECT user_id, name, surname FROM users"; //TODO: zmienić na wyświetlanie tylko wyników wyszukiwania wśród wszystkich użytkowników
+                if(isset($searchQuote)){
+                    $query = "SELECT user_id, name, surname FROM users WHERE (name = '$searchQuote' OR surname = '$searchQuote' OR CONCAT(name, ' ', surname) = '$searchQuote');"; //TODO: zmienić na wyświetlanie tylko wyników wyszukiwania wśród wszystkich użytkowników
+                }else{
+                    $query = "SELECT user_id, name, surname FROM users;"; //TODO: zmienić na wyświetlanie tylko wyników wyszukiwania wśród wszystkich użytkowników
+                }
             }
             $result = $this->conn->query($query);
             $resultArray = $result -> fetchAll(PDO::FETCH_ASSOC);
@@ -157,10 +161,12 @@ class Database
             $result = $this->conn->query($query); 
             $queryResult = $result->fetch(PDO::FETCH_ASSOC);
             if($queryResult['COUNT(*)'] == 0){    
-                return  "Taki użytkownik nie istnieje";
+                $error = "Taki użytkownik nie istnieje!";
+                return  $error;
             }else{
-                if(password_verify($password, $queryResult['password'])){
-                    return "Błędne hasło!";
+                if(!password_verify($password, trim($queryResult['password']))){
+                    $error = "Błędne hasło!";
+                    return  $error;
                 }else{
                         session_start();
                         $_SESSION['loggedin'] = true;
@@ -341,6 +347,7 @@ class Database
             $result = $this->conn->query($query); 
             return $result->fetch(PDO::FETCH_ASSOC);
         }catch(Throwable $e){
+            dump($e);
             throw new StorageException("Błąd pobierania danych konta!");
         }
     }

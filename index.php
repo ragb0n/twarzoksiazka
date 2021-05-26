@@ -4,21 +4,20 @@ declare(strict_types=1);
 
 namespace App;
 
+require_once('src/utils/debug.php');
+require_once('src/Controller.php');
+require_once('src/Exceptions/AppException.php');
+require_once('src/Exceptions/ConfigurationException.php');
+require_once('src/Request.php');
+
+use App\Request;
 use App\Exception\ConfigurationException;
 use App\Exception\AppException;
 use Throwable; //interfejs Throwable zawiera metody do obsługi wyjątków
 
-require_once('src/utils/debug.php');
-require_once('src/controller.php');
-require_once('src/Exceptions/AppException.php');
-require_once('src/Exceptions/ConfigurationException.php');
-
 $configuration = require_once('config/config.php');;
 
-$request = [
-    'get' => $_GET,
-    'post' => $_POST
-];
+$request = new Request($_GET, $_POST);
 
 try {
     session_start();

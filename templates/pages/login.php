@@ -8,14 +8,19 @@
         </div>
         <div class="login_form">
             <h2>Logowanie</h2>
-            <div class="login_error"><?php echo $params['login_error']; ?>
+            <div class="login_error">
+                <?php echo $params['username_error'] ?? null; ?>
+                <?php echo $params['login_error'] ?? null; ?>
             </div>
             <form action="/?action=login" method="post" id="login_form">
                 <div>
                     <label>Nazwa użytkownika</label>
                     <input type="text" name="username" class="login_form_field">
                 </div>
-                <div>
+                <div>            
+                    <div class="login_error">
+                        <?php echo $params['password_error'] ?? null; ?>
+                    </div>
                     <label>Hasło</label>
                     <input type="password" name="password" class="login_form_field">
                 </div>

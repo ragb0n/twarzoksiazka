@@ -1,6 +1,48 @@
 <div class="register">
     <h2>Edycja danych</h2>
     <p>W tym miejscu możesz zmienić dane swojego profilu</p>
+
+    Aktualne informacje
+    <hr>
+    <div>
+        Imię: <?php echo $params['currentInfo']['name']; ?>
+    </div>
+    <div>
+        Nazwisko: <?php echo $params['currentInfo']['surname']; ?>
+    </div>
+    <div>
+        Nazwa użytkownika: <?php echo $params['currentInfo']['name']; ?>
+    </div>
+    <div>
+        E-mail: <?php echo $params['currentInfo']['name']; ?>
+    </div>
+    <div>
+        Data-urodzenia: <?php echo $params['currentInfo']['birth_date']; ?>
+    </div>
+    <div>
+        Płeć: <?php echo $params['currentInfo']['sex']; ?>
+    </div>
+    <div>
+        Mieszkasz w: <?php echo $params['currentInfo']['city']; ?>
+    </div>
+    <div>
+        Pochodzisz z: <?php echo $params['currentInfo']['birth_place']; ?>
+    </div>
+    <div>
+        Gdzie się uczysz: <?php echo $params['currentInfo']['school']; ?>
+    </div>
+    <div>
+        Gdzie pracujesz: <?php echo $params['currentInfo']['work']; ?>
+    </div>
+    <div>
+        Twoje hobby: <?php echo $params['currentInfo']['hobby']; ?>
+    </div>
+    <div>
+        Coś więcej o Tobie: <?php echo $params['currentInfo']['about']; ?>
+    </div>
+    <br>
+    Formularz aktualizacyjny
+    <hr>
     <form action="/?action=editProfile" method="post" id="update_form" enctype="multipart/form-data">
         <div class="register_required">
         <br>
@@ -72,14 +114,6 @@
                 <input type="text" name="update_birth_place" class="register_form_field">
             </div>
             <div>
-                <label>Zdjęcie profilowe (max. 30 MB, format jpg, png, jpeg)</label>
-                <input type="file" name="update_profile_photo" class="register_form_field">
-            </div>
-            <div>
-                <label>Zdjęcie w tle (max. 30 MB, format jpg, png, jpeg)</label>
-                <input type="file" name="update_background_photo" class="register_form_field">
-            </div>
-            <div>
                 <label>Gdzie się uczysz?</label>
                 <input type="text" name="update_school" class="register_form_field">
             </div>
@@ -97,8 +131,6 @@
             </div>
         </div>
         <div class="register_summary">
-            <br>
-            <br>
             <button type="submit" form="update_form">Aktualizuj dane</button>
         </div>
     </form>  

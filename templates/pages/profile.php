@@ -112,7 +112,6 @@
             <?php endif ?>
         </div>
     </div>
-
     <div class="profile_content_right">
         <div class="profile_posts">
             <div class="profile_post">
