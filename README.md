@@ -51,7 +51,7 @@ Soon
 * create simple chat 
 
 ## Project status
-Soon
+Suspended
 
 ## Sources
 Soon
